@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "/mKJyWO5DjUPEIByCZm2S+eHOyP5tlrplzMpIloJ9V1hBxPl3dsn+fnLVfOaqLbFtfvffKbDf4FoaAd+bto3cQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Will\\Documents\\AuthFunction\\AuthDtos\\AuthDtos.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Will\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512",
+    "C:\\Users\\Will\\.nuget\\packages\\system.componentmodel.annotations\\4.7.0\\system.componentmodel.annotations.4.7.0.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,9 @@
+C:\Users\Will\Documents\AuthFunction\AuthDtos\bin\Debug\netstandard2.0\AuthDtos.deps.json
+C:\Users\Will\Documents\AuthFunction\AuthDtos\bin\Debug\netstandard2.0\AuthDtos.dll
+C:\Users\Will\Documents\AuthFunction\AuthDtos\obj\Debug\netstandard2.0\AuthDtos.csprojAssemblyReference.cache
+C:\Users\Will\Documents\AuthFunction\AuthDtos\obj\Debug\netstandard2.0\AuthDtos.AssemblyInfoInputs.cache
+C:\Users\Will\Documents\AuthFunction\AuthDtos\obj\Debug\netstandard2.0\AuthDtos.AssemblyInfo.cs
+C:\Users\Will\Documents\AuthFunction\AuthDtos\bin\Debug\netstandard2.0\AuthDtos.pdb
+C:\Users\Will\Documents\AuthFunction\AuthDtos\obj\Debug\netstandard2.0\AuthDtos.csproj.CoreCompileInputs.cache
+C:\Users\Will\Documents\AuthFunction\AuthDtos\obj\Debug\netstandard2.0\AuthDtos.dll
+C:\Users\Will\Documents\AuthFunction\AuthDtos\obj\Debug\netstandard2.0\AuthDtos.pdb

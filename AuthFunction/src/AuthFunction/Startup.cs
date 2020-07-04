@@ -2,10 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AuthRepository.Context;
+using AuthRepository.Interfaces;
+using AuthService.Interfaces;
+using EFCore.DbContextFactory.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -51,6 +56,15 @@ namespace AuthFunction
                             });
             });
 
+            //service
+            services.AddTransient<IAuthService, AuthService.Services.AuthService>();
+
+            //repo
+            services.AddTransient<IAuthRepository, AuthRepository.Implementations.AuthRepository>();
+            services.AddDbContext<AuthDbContext>(builder =>
+                builder.UseMySQL(Configuration.GetConnectionString("AuthDb")));
+            services.AddDbContextFactory<AuthDbContext>(builder=> 
+                builder.UseMySQL(Configuration.GetConnectionString("AuthDb")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline

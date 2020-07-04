@@ -10,4 +10,7 @@
     <PackageReference Include="Amazon.Lambda.AspNetCoreServer" Version="5.1.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\AuthService\AuthService.csproj" />
+  </ItemGroup>
 </Project>
