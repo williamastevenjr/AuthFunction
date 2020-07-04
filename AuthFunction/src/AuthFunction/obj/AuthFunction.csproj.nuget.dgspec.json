@@ -52,6 +52,10 @@
             "Amazon.Lambda.AspNetCoreServer": {
               "target": "Package",
               "version": "[5.1.2, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[5.5.1, )"
             }
           },
           "imports": [
