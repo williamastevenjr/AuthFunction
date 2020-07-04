@@ -9,14 +9,6 @@ namespace AuthMigrations
         static void Main(string[] args)
         {
         }
-
-        //CreateHostBuilder(args).Build().Run();
-        //}
-
-        //public static IHostBuilder CreateHostBuilder(string[] args)
-        //    => Host.CreateDefaultBuilder(args)
-        //        .ConfigureAppConfiguration(
-        //            webBuilder => webBuilder.UseStartup<Startup>());
     }
 
 }
