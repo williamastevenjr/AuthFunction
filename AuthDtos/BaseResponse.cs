@@ -6,6 +6,11 @@ namespace AuthDtos
 {
     public class BaseResponse
     {
+        public BaseResponse(object data)
+        {
+            Data = data;
+        }
+
         public int Version { get; set; }
         public int Revision { get; set; }
 

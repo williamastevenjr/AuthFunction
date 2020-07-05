@@ -111,6 +111,10 @@
               "target": "Package",
               "version": "[2.0.0, )"
             },
+            "JWT": {
+              "target": "Package",
+              "version": "[7.2.1, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[3.1.5, )"
@@ -140,6 +144,10 @@
               "target": "Package",
               "version": "[2.0.3, )",
               "autoReferenced": true
+            },
+            "System.Security.Cryptography.Algorithms": {
+              "target": "Package",
+              "version": "[4.3.1, )"
             }
           },
           "imports": [

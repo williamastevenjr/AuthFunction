@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using AuthDtos.Request;
 
 namespace AuthService.Interfaces
 {
     public interface IAuthService
     {
-        bool Auth(JwtAuthRequest request);
+        Task<string> Auth(JwtAuthRequest request);
+        Task<Guid> CreateAuth(string username, string password);
     }
 }
