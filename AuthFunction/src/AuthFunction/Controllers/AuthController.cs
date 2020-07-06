@@ -15,7 +15,6 @@ namespace AuthFunction.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-
         private readonly IAuthService _authService;
 
         public AuthController(IAuthService authService)
@@ -24,7 +23,7 @@ namespace AuthFunction.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Get([FromBody] JwtAuthRequest request)
+        public async Task<ActionResult> JwtAuth([FromBody] JwtAuthRequest request)
         {
             var result = await _authService.Auth(request);
             if (result == null)
@@ -35,11 +34,26 @@ namespace AuthFunction.Controllers
             return Ok(new BaseResponse(result));
         }
 
+        [HttpPost("refresh_token")]
+        public async Task<ActionResult> JwtRefresh([FromBody] AuthRefreshTokenRequest request)
+        {
+            var result = await _authService.RefreshTokenAuth(request);
+            if (result == null)
+            {
+                return BadRequest();
+            }
+            return Ok(new BaseResponse(result));
+        }
+
         [HttpPost("Account")]
-        public async Task<ActionResult> Post([FromBody] CreateAccountRequest request)
+        public async Task<ActionResult> CreateAccount([FromBody] CreateAccountRequest request)
         {
             var result = await _authService.CreateAuth(request.Username, request.Password);
-            return Ok(result);
+            if (result == null)
+            {
+                return BadRequest();
+            }
+            return Ok(new BaseResponse(result));
         }
     }
 }

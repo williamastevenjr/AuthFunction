@@ -9,15 +9,17 @@ namespace AuthRepository.DataModels
     public class AuthUser
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public Guid AuthUserGuid { get; set; }
-
+        public Guid Guid { get; set; }
+        
         [Required, MaxLength(30)]
         public string Username { get; set; }
 
-        [Required, MaxLength(264)]
+        [Required, MinLength(264), MaxLength(264)]
         public byte[] Salt { get; set; }
 
-        [Required, MaxLength(264)]
+        [Required, MinLength(264), MaxLength(264)]
         public byte[] PasswordHash { get; set; }
+
+        public virtual IList<JwtRefreshToken> RefreshTokens { get; set; }
     }
 }

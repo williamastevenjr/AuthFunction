@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AuthDtos.Request;
+using AuthDtos.Response;
 using AuthRepository.Interfaces;
 using AuthService.Interfaces;
 
@@ -16,15 +17,22 @@ namespace AuthService.Services
             _authRepository = authRepository;
         }
 
-        public async Task<string> Auth(JwtAuthRequest request)
+        public async Task<JwtAuthResponse> Auth(JwtAuthRequest request)
         {
             var result = await _authRepository.Auth(request);
             return result;
         }
 
-        public async Task<Guid> CreateAuth(string username, string password)
+        public async Task<JwtAuthResponse> RefreshTokenAuth(AuthRefreshTokenRequest request)
         {
-            return await _authRepository.CreateAuth(username, password);
+            var result = await _authRepository.RefreshTokenAuth(request);
+            return result;
+        }
+
+        public async Task<JwtAuthResponse> CreateAuth(string username, string password)
+        {
+            var result = await _authRepository.CreateAuth(username, password);
+            return result;
         }
     }
 }

@@ -6,6 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20200705221842_init2.cs" />
+    <Compile Remove="Migrations\20200705221842_init2.Designer.cs" />
+    <Compile Remove="Migrations\20200705222250_init2.cs" />
+    <Compile Remove="Migrations\20200705222250_init2.Designer.cs" />
+    <Compile Remove="Migrations\20200705222350_init2.cs" />
+    <Compile Remove="Migrations\20200705222350_init2.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="appsettings.json" />
   </ItemGroup>
 

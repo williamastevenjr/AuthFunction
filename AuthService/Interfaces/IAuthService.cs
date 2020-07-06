@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using AuthDtos.Request;
+using AuthDtos.Response;
 
 namespace AuthService.Interfaces
 {
     public interface IAuthService
     {
-        Task<string> Auth(JwtAuthRequest request);
-        Task<Guid> CreateAuth(string username, string password);
+        Task<JwtAuthResponse> Auth(JwtAuthRequest request);
+        Task<JwtAuthResponse> RefreshTokenAuth(AuthRefreshTokenRequest request);
+        Task<JwtAuthResponse> CreateAuth(string username, string password);
     }
 }

@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using AuthDtos.Request;
+using AuthDtos.Response;
 using AuthRepository.Context;
 using AuthRepository.DataModels;
 using AuthRepository.Interfaces;
@@ -24,7 +25,7 @@ namespace AuthRepository.Implementations
             _contextFactory = contextFactory;
         }
 
-        public async Task<string> Auth(JwtAuthRequest request)
+        public async Task<JwtAuthResponse> Auth(JwtAuthRequest request)
         {
             await using var context = _contextFactory.Invoke();
             var userResult = await context.AuthUsers.Where(x => x.Username.Equals(request.Username))
@@ -32,25 +33,85 @@ namespace AuthRepository.Implementations
                 {
                     salt = x.Salt,
                     hash = x.PasswordHash,
-                    guid = x.AuthUserGuid
+                    guid = x.Guid
                 })
                 .FirstOrDefaultAsync();
-            string result = null;
+            JwtAuthResponse response = null;
             if (userResult != null)
             {
                 if (Validate(request.Password, userResult.salt, userResult.hash))
                 {
-                    result = GenerateJwt(userResult.guid);
+                    var jwt = GenerateJwt(userResult.guid);
+                    var refreshToken = GenerateRefreshToken(userResult.guid);
+                    if (!string.IsNullOrWhiteSpace(refreshToken) && !string.IsNullOrWhiteSpace(jwt))
+                    {
+                        var expiration = DateTime.UtcNow.AddDays(31);
+                        var refreshTokenStore = new JwtRefreshToken
+                        {
+                            UserGuid = userResult.guid,
+                            ExpiresAt = expiration,
+                            RefreshTokenString = refreshToken
+                        };
+                        await context.RefreshTokens.AddAsync(refreshTokenStore);
+                        await context.SaveChangesAsync();
+
+                        response = new JwtAuthResponse(jwt, refreshToken, expiration);
+                    }
                 }
                 else
                 {
                     throw new Exception("fuck off");
                 }
             }
-            return result;
+            
+            return response;
         }
 
-        public async Task<Guid> CreateAuth(string username, string password)
+        public async Task<JwtAuthResponse> RefreshTokenAuth(AuthRefreshTokenRequest refreshTokenRequest)
+        {
+            await using var context = _contextFactory.Invoke();
+            var refresh = await context.RefreshTokens.FirstOrDefaultAsync(x =>
+                x.UserGuid.Equals(refreshTokenRequest.UserGuid) &&
+                x.RefreshTokenString.Equals(refreshTokenRequest.RefreshToken));
+            JwtAuthResponse response = null;
+            if (refresh != null)
+            {
+                var jwt = GenerateJwt(refreshTokenRequest.UserGuid);
+                var refreshToken = GenerateRefreshToken(refreshTokenRequest.UserGuid);
+                if (!string.IsNullOrWhiteSpace(refreshToken) && !string.IsNullOrWhiteSpace(jwt))
+                {
+                    var expiration = DateTime.UtcNow.AddDays(31);
+                    var refreshTokenStore = new JwtRefreshToken
+                    {
+                        UserGuid = refreshTokenRequest.UserGuid,
+                        ExpiresAt = expiration,
+                        RefreshTokenString = refreshToken
+                    };
+                    await context.RefreshTokens.AddAsync(refreshTokenStore);
+                    context.RefreshTokens.Remove(refresh);
+                    await context.SaveChangesAsync();
+
+                    response = new JwtAuthResponse(jwt, refreshToken, expiration);
+                }
+            }
+
+            return response;
+        }
+
+        public async Task<bool> RemoveExpiredRefreshTokens()
+        {
+            await using var context = _contextFactory.Invoke();
+            var expiredTokens = await context.RefreshTokens.Where(x => x.ExpiresAt <= DateTime.UtcNow).ToListAsync();
+            if (expiredTokens.Count > 0)
+            {
+                context.RefreshTokens.RemoveRange(expiredTokens);
+                await context.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
+        public async Task<JwtAuthResponse> CreateAuth(string username, string password)
         {
             await using var context = _contextFactory.Invoke();
             var taken = (await context.AuthUsers.CountAsync(x => x.Username.Equals(username))) != 0;
@@ -60,26 +121,66 @@ namespace AuthRepository.Implementations
                 var account = new AuthUser
                 {
                     Username = username,
-                    AuthUserGuid = Guid.NewGuid(),
+                    Guid = Guid.NewGuid(),
                     Salt = saltAndHash.salt,
                     PasswordHash = saltAndHash.hash
                 };
                 await context.AuthUsers.AddAsync(account);
+                var jwt = GenerateJwt(account.Guid);
+                var refreshToken = GenerateRefreshToken(account.Guid);
+                var expiration = DateTime.UtcNow.AddDays(31);
+                var refreshTokenStore = new JwtRefreshToken
+                {
+                    UserGuid = account.Guid,
+                    ExpiresAt = expiration,
+                    RefreshTokenString = refreshToken
+                };
+                await context.RefreshTokens.AddAsync(refreshTokenStore);
                 await context.SaveChangesAsync();
-                return account.AuthUserGuid;
+                var response = new JwtAuthResponse(jwt, refreshToken, expiration);
+                return response;
             }
             throw new Exception("todo");
         }
 
-        public bool Validate(string password, byte[] salt, byte[] hash)
+        public async Task<bool> RemoveRefreshTokens(Guid userGuid)
+        {
+            await using var context = _contextFactory.Invoke();
+            var refreshTokens = await context.RefreshTokens.Where(x => x.UserGuid.Equals(userGuid))
+                .ToListAsync();
+            context.RefreshTokens.RemoveRange(refreshTokens);
+            await context.SaveChangesAsync();
+            return true;
+        }
+
+        private string GenerateRefreshToken(Guid userGuid)
+        {
+            const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_-;:'<>,.|+=/";
+            StringBuilder res = new StringBuilder();
+            using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
+            {
+                byte[] uintBuffer = new byte[sizeof(uint)];
+                var length = 512;
+                while (length-- > 0)
+                {
+                    rng.GetBytes(uintBuffer);
+                    uint num = BitConverter.ToUInt32(uintBuffer, 0);
+                    res.Append(valid[(int)(num % (uint)valid.Length)]);
+                }
+            }
+
+            return res.ToString();
+        }
+
+        private bool Validate(string password, byte[] salt, byte[] hash)
         {
             using RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
             int iterations = 10000;
             Rfc2898DeriveBytes derived = new Rfc2898DeriveBytes(password, salt, iterations);
             return derived.GetBytes(256).SequenceEqual(hash);
         }
-
-        public (byte[] salt, byte[] hash) SaltAndHash(string password)
+        
+        private (byte[] salt, byte[] hash) SaltAndHash(string password)
         {
             var salt = new byte[256];
             using RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
@@ -89,15 +190,15 @@ namespace AuthRepository.Implementations
             return (salt, derived.GetBytes(256));
         }
 
-        public string GenerateJwt(Guid userGuid)
+        private string GenerateJwt(Guid userGuid)
         {
             var payload = new Dictionary<string, object>
             {
                 { "iss", "dummythiccapi.auth" },
                 { "sub", userGuid.ToString() },
                 { "aud", "dummythiccapi.*" },
-                { "exp", (int)DateTime.UtcNow.AddDays(1).Subtract(new DateTime(1970, 1, 1)).TotalSeconds },
-                { "iat", (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds },
+                { "exp", (int)((DateTimeOffset)DateTime.UtcNow.AddDays(1)).ToUnixTimeSeconds() },
+                { "iat", (int)((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() },
                 { "jti", "dummythiccapi.auth" },
                 { "rol", "user" }
             };
@@ -112,5 +213,7 @@ namespace AuthRepository.Implementations
             var token = encoder.Encode(payload, secret);
             return token;
         }
+
+        
     }
 }

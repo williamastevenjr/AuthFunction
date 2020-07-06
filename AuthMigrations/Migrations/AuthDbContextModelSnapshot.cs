@@ -19,7 +19,7 @@ namespace AuthMigrations.Migrations
 
             modelBuilder.Entity("AuthRepository.DataModels.AuthUser", b =>
                 {
-                    b.Property<byte[]>("AuthUserGuid")
+                    b.Property<byte[]>("Guid")
                         .HasColumnType("varbinary(16)");
 
                     b.Property<byte[]>("PasswordHash")
@@ -37,12 +37,45 @@ namespace AuthMigrations.Migrations
                         .HasColumnType("varchar(30)")
                         .HasMaxLength(30);
 
-                    b.HasKey("AuthUserGuid");
+                    b.HasKey("Guid");
 
                     b.HasIndex("Username")
                         .IsUnique();
 
                     b.ToTable("AuthUsers");
+                });
+
+            modelBuilder.Entity("AuthRepository.DataModels.JwtRefreshToken", b =>
+                {
+                    b.Property<byte[]>("UserGuid")
+                        .HasColumnType("varbinary(16)");
+
+                    b.Property<string>("RefreshTokenString")
+                        .HasColumnType("varchar(512)")
+                        .HasMaxLength(512);
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime>("IssuedAt")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("UserGuid", "RefreshTokenString");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("IssuedAt");
+
+                    b.ToTable("RefreshTokens");
+                });
+
+            modelBuilder.Entity("AuthRepository.DataModels.JwtRefreshToken", b =>
+                {
+                    b.HasOne("AuthRepository.DataModels.AuthUser", "AuthUser")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserGuid")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
