@@ -34,5 +34,17 @@ namespace AuthService.Services
             var result = await _authRepository.CreateAuth(username, password);
             return result;
         }
+
+        public async Task<bool> RemoveRefreshTokens(Guid userGuid)
+        {
+            var result = await _authRepository.RemoveRefreshTokens(userGuid);
+            return result;
+        }
+
+        public async Task<bool> RemoveExpiredRefreshTokens()
+        {
+            var result = await _authRepository.RemoveExpiredRefreshTokens();
+            return result;
+        }
     }
 }

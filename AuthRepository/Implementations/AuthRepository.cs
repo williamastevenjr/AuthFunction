@@ -203,7 +203,7 @@ namespace AuthRepository.Implementations
                 Issuer = "dummythiccapi",
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, userGuid.ToString()),
+                    new Claim("sub", userGuid.ToString()),
                     new Claim(ClaimTypes.Role, "User")
                 }),
                 Audience = "dummythiccapi",
@@ -215,28 +215,6 @@ namespace AuthRepository.Implementations
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
 
-            //var payload = new Dictionary<string, object>
-            //{
-            //    { "iss", "dummythiccapi.auth" },
-            //    { "sub", userGuid.ToString() },
-            //    { "aud", "dummythiccapi.*" },
-            //    { "exp", (int)((DateTimeOffset)DateTime.UtcNow.AddDays(1)).ToUnixTimeSeconds() },
-            //    { "iat", (int)((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() },
-            //    { "jti", Guid.NewGuid().ToString() },
-            //    { "rol", "user" }
-            //};
-
-            //const string secret = "SmokinessPatienceOpulentlyMannedMothproofTreeBufferHuntsman";
-
-            //IJwtAlgorithm algorithm = new HMACSHA256Algorithm(); // symmetric
-            //IJsonSerializer serializer = new JsonNetSerializer();
-            //IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();
-            //IJwtEncoder encoder = new JwtEncoder(algorithm, serializer, urlEncoder);
-
-            //var token = encoder.Encode(payload, secret);
-            //return token;
         }
-
-        
     }
 }

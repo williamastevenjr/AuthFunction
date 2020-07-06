@@ -12,5 +12,9 @@ namespace AuthService.Interfaces
         Task<JwtAuthResponse> Auth(JwtAuthRequest request);
         Task<JwtAuthResponse> RefreshTokenAuth(AuthRefreshTokenRequest request);
         Task<JwtAuthResponse> CreateAuth(string username, string password);
+
+        Task<bool> RemoveRefreshTokens(Guid userGuid);
+
+        Task<bool> RemoveExpiredRefreshTokens();
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AuthDtos;
 using AuthDtos.Request;
 using AuthService.Interfaces;
+using JwtAuth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -62,10 +63,11 @@ namespace AuthFunction.Controllers
         }
 
         [HttpPost("Logout")]
-        [Authorize]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> Logout()
         {
-            var userGuid = HttpContext.User;
+            var user = JwtUser.GetJwtUser(HttpContext);
+            await _authService.RemoveRefreshTokens(user.UserGuid);
             return Ok();
         }
     }
