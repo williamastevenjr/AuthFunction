@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +15,7 @@ using JWT;
 using JWT.Algorithms;
 using JWT.Serializers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AuthRepository.Implementations
 {
@@ -192,26 +195,46 @@ namespace AuthRepository.Implementations
 
         private string GenerateJwt(Guid userGuid)
         {
-            var payload = new Dictionary<string, object>
+            // generate token that is valid for 7 days
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes("SmokinessPatienceOpulentlyMannedMothproofTreeBufferHuntsman");
+            var tokenDescriptor = new SecurityTokenDescriptor
             {
-                { "iss", "dummythiccapi.auth" },
-                { "sub", userGuid.ToString() },
-                { "aud", "dummythiccapi.*" },
-                { "exp", (int)((DateTimeOffset)DateTime.UtcNow.AddDays(1)).ToUnixTimeSeconds() },
-                { "iat", (int)((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() },
-                { "jti", "dummythiccapi.auth" },
-                { "rol", "user" }
+                Issuer = "dummythiccapi",
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, userGuid.ToString()),
+                    new Claim(ClaimTypes.Role, "User")
+                }),
+                Audience = "dummythiccapi",
+                IssuedAt = DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddDays(1),
+
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
 
-            const string secret = "SmokinessPatienceOpulentlyMannedMothproofTreeBufferHuntsman";
+            //var payload = new Dictionary<string, object>
+            //{
+            //    { "iss", "dummythiccapi.auth" },
+            //    { "sub", userGuid.ToString() },
+            //    { "aud", "dummythiccapi.*" },
+            //    { "exp", (int)((DateTimeOffset)DateTime.UtcNow.AddDays(1)).ToUnixTimeSeconds() },
+            //    { "iat", (int)((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() },
+            //    { "jti", Guid.NewGuid().ToString() },
+            //    { "rol", "user" }
+            //};
 
-            IJwtAlgorithm algorithm = new HMACSHA256Algorithm(); // symmetric
-            IJsonSerializer serializer = new JsonNetSerializer();
-            IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();
-            IJwtEncoder encoder = new JwtEncoder(algorithm, serializer, urlEncoder);
+            //const string secret = "SmokinessPatienceOpulentlyMannedMothproofTreeBufferHuntsman";
 
-            var token = encoder.Encode(payload, secret);
-            return token;
+            //IJwtAlgorithm algorithm = new HMACSHA256Algorithm(); // symmetric
+            //IJsonSerializer serializer = new JsonNetSerializer();
+            //IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();
+            //IJwtEncoder encoder = new JwtEncoder(algorithm, serializer, urlEncoder);
+
+            //var token = encoder.Encode(payload, secret);
+            //return token;
         }
 
         

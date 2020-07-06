@@ -9,9 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthRepository", "AuthRepos
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthDtos", "AuthDtos\AuthDtos.csproj", "{D7F2E919-2651-4C1D-9FCA-EE1F4B9DAE17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService", "AuthService\AuthService.csproj", "{5522A876-3683-446E-93AA-39F33140530E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthService", "AuthService\AuthService.csproj", "{5522A876-3683-446E-93AA-39F33140530E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthMigrations", "AuthMigrations\AuthMigrations.csproj", "{0017113F-1D98-4200-8823-C258E2CCBFAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthMigrations", "AuthMigrations\AuthMigrations.csproj", "{0017113F-1D98-4200-8823-C258E2CCBFAF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{F783F385-E87D-429A-9A36-2632056A1909}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtAuth", "..\Common\JwtAuth\JwtAuth.csproj", "{5D8FA206-B72F-4C43-B500-0553EAF82A23}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,9 +43,16 @@ Global
 		{0017113F-1D98-4200-8823-C258E2CCBFAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0017113F-1D98-4200-8823-C258E2CCBFAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0017113F-1D98-4200-8823-C258E2CCBFAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D8FA206-B72F-4C43-B500-0553EAF82A23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D8FA206-B72F-4C43-B500-0553EAF82A23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D8FA206-B72F-4C43-B500-0553EAF82A23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D8FA206-B72F-4C43-B500-0553EAF82A23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5D8FA206-B72F-4C43-B500-0553EAF82A23} = {F783F385-E87D-429A-9A36-2632056A1909}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E7AAF9F7-70E5-49A4-9096-EA6FA2FDCA35}

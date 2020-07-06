@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AuthDtos;
 using AuthDtos.Request;
 using AuthService.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthFunction.Controllers
@@ -13,6 +14,7 @@ namespace AuthFunction.Controllers
     /// ASP.NET Core Auth controller.
     /// </summary>
     [Route("api/[controller]")]
+    [Authorize]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -23,6 +25,7 @@ namespace AuthFunction.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult> JwtAuth([FromBody] JwtAuthRequest request)
         {
             var result = await _authService.Auth(request);
@@ -35,6 +38,7 @@ namespace AuthFunction.Controllers
         }
 
         [HttpPost("refresh_token")]
+        [AllowAnonymous]
         public async Task<ActionResult> JwtRefresh([FromBody] AuthRefreshTokenRequest request)
         {
             var result = await _authService.RefreshTokenAuth(request);
@@ -46,6 +50,7 @@ namespace AuthFunction.Controllers
         }
 
         [HttpPost("Account")]
+        [AllowAnonymous]
         public async Task<ActionResult> CreateAccount([FromBody] CreateAccountRequest request)
         {
             var result = await _authService.CreateAuth(request.Username, request.Password);
@@ -54,6 +59,14 @@ namespace AuthFunction.Controllers
                 return BadRequest();
             }
             return Ok(new BaseResponse(result));
+        }
+
+        [HttpPost("Logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            var userGuid = HttpContext.User;
+            return Ok();
         }
     }
 }
