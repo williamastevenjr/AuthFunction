@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using Thinktecture;
+using Ws.EfCore.Extensions.TypeMappingExtensions;
 
 namespace AuthMigrations
 {
@@ -14,7 +16,8 @@ namespace AuthMigrations
                 .Build();
 
             var builder = new DbContextOptionsBuilder<AuthDbContext>();
-            builder.UseMySQL(configuration.GetConnectionString("AuthDb"), b=>b.MigrationsAssembly("AuthMigrations"));
+            builder.UseMySql(configuration.GetConnectionString("AuthDb"), b=>b.MigrationsAssembly("AuthMigrations"))
+                .AddRelationalTypeMappingSourcePlugin<MiniGuidTypeMappingPlugin>();
 
             return new AuthDbContext(builder.Options);
         }

@@ -1,26 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AuthRepository.Context;
+﻿using AuthRepository.Context;
 using AuthRepository.Interfaces;
 using AuthService.Interfaces;
 using EFCore.DbContextFactory.Extensions;
 using JwtAuth;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Thinktecture;
+using Ws.EfCore.Extensions.TypeMappingExtensions;
+using Ws.JwtAuth.Extensions;
 
 namespace AuthFunction
 {
@@ -70,9 +62,11 @@ namespace AuthFunction
             //repo
             services.AddTransient<IAuthRepository, AuthRepository.Implementations.AuthRepository>();
             services.AddDbContext<AuthDbContext>(builder =>
-                builder.UseMySQL(Configuration.GetConnectionString("AuthDb")));
+                builder.UseMySql(Configuration.GetConnectionString("AuthDb"))
+                    .AddRelationalTypeMappingSourcePlugin<MiniGuidTypeMappingPlugin>());
             services.AddDbContextFactory<AuthDbContext>(builder=> 
-                builder.UseMySQL(Configuration.GetConnectionString("AuthDb")));
+                builder.UseMySql(Configuration.GetConnectionString("AuthDb"))
+                    .AddRelationalTypeMappingSourcePlugin<MiniGuidTypeMappingPlugin>());
 
         }
 
@@ -84,15 +78,15 @@ namespace AuthFunction
                 app.UseDeveloperExceptionPage();
             }
 
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
 
             app.UseRouting();
 
             // global cors policy
-            app.UseCors(x => x
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
+            //app.UseCors(x => x
+            //    .AllowAnyOrigin()
+            //    .AllowAnyMethod()
+            //    .AllowAnyHeader());
 
             app.UseAuthentication();
             app.UseAuthorization();

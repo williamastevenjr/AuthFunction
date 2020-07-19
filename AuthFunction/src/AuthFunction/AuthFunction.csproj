@@ -3,19 +3,25 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <AWSProjectType>Lambda</AWSProjectType>
+    <PublishTrimmed>true</PublishTrimmed>
+    <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.3.111.21" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.111.27" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.3.101" />
     <PackageReference Include="Amazon.Lambda.AspNetCoreServer" Version="5.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.5">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.6" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
+    <PackageReference Include="Thinktecture.EntityFrameworkCore.Relational" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Common\JwtAuth\JwtAuth.csproj" />
+    <ProjectReference Include="..\..\..\..\Common\Ws.EfCore.Extensions\Ws.EfCore.Extensions.csproj" />
+    <ProjectReference Include="..\..\..\..\Common\Ws.JwtAuth.Extensions\Ws.JwtAuth.Extensions.csproj" />
     <ProjectReference Include="..\..\..\AuthService\AuthService.csproj" />
   </ItemGroup>
 </Project>

@@ -15,7 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthMigrations", "AuthMigra
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{F783F385-E87D-429A-9A36-2632056A1909}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtAuth", "..\Common\JwtAuth\JwtAuth.csproj", "{5D8FA206-B72F-4C43-B500-0553EAF82A23}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtAuth", "..\Common\JwtAuth\JwtAuth.csproj", "{5D8FA206-B72F-4C43-B500-0553EAF82A23}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ws.EfCore.Extensions", "..\Common\Ws.EfCore.Extensions\Ws.EfCore.Extensions.csproj", "{818C7920-AB48-4526-B14E-7145D7731CCC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ws.JwtAuth.Extensions", "..\Common\Ws.JwtAuth.Extensions\Ws.JwtAuth.Extensions.csproj", "{046B8607-0B62-40F9-93B7-B5ACE057FE2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,12 +51,22 @@ Global
 		{5D8FA206-B72F-4C43-B500-0553EAF82A23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D8FA206-B72F-4C43-B500-0553EAF82A23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D8FA206-B72F-4C43-B500-0553EAF82A23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{818C7920-AB48-4526-B14E-7145D7731CCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{818C7920-AB48-4526-B14E-7145D7731CCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{818C7920-AB48-4526-B14E-7145D7731CCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{818C7920-AB48-4526-B14E-7145D7731CCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{046B8607-0B62-40F9-93B7-B5ACE057FE2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{046B8607-0B62-40F9-93B7-B5ACE057FE2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{046B8607-0B62-40F9-93B7-B5ACE057FE2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{046B8607-0B62-40F9-93B7-B5ACE057FE2E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5D8FA206-B72F-4C43-B500-0553EAF82A23} = {F783F385-E87D-429A-9A36-2632056A1909}
+		{818C7920-AB48-4526-B14E-7145D7731CCC} = {F783F385-E87D-429A-9A36-2632056A1909}
+		{046B8607-0B62-40F9-93B7-B5ACE057FE2E} = {F783F385-E87D-429A-9A36-2632056A1909}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E7AAF9F7-70E5-49A4-9096-EA6FA2FDCA35}

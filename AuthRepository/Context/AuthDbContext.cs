@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using AuthRepository.DataModels;
 using Microsoft.EntityFrameworkCore;
-using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using MiniGuids;
 
 namespace AuthRepository.Context
 {
@@ -18,22 +17,35 @@ namespace AuthRepository.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            //AuthUser
             modelBuilder.Entity<AuthUser>()
                 .HasIndex(x => x.Username)
-                .IsUnique()
-                .HasFilter(null);
-
-            modelBuilder.Entity<JwtRefreshToken>()
-                .HasKey(x => new {x.UserGuid, x.RefreshTokenString});
-            modelBuilder.Entity<JwtRefreshToken>()
-                .HasOne(x => x.AuthUser)
-                .WithMany(x => x.RefreshTokens)
+                .IsUnique();
+            modelBuilder.Entity<AuthUser>()
+                .HasMany(x => x.RefreshTokens)
+                .WithOne(x => x.AuthUser)
+                .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<AuthUser>()
+                .HasOne(x => x.AuthRole)
+                .WithMany()
+                .HasForeignKey(x => x.AuthRoleId);
+
+            ////AuthUserRoles
+            //modelBuilder.Entity<AuthUserRole>()
+            //    .HasKey(x => new {x.AuthUserId, x.AuthRoleId});
+            //modelBuilder.Entity<AuthUserRole>()
+            //    .HasOne(x => x.AuthRole)
+            //    .WithMany()
+            //    .HasForeignKey(x => x.AuthRoleId);
+
+            //JwtRefreshToken
+            modelBuilder.Entity<JwtRefreshToken>()
+                .HasKey(x => new {x.UserId, x.RefreshTokenString});
             modelBuilder.Entity<JwtRefreshToken>()
                 .HasIndex(x => x.ExpiresAt);
-            modelBuilder.Entity<JwtRefreshToken>()
-                .HasIndex(x => x.IssuedAt);
-
         }
+
     }
 }

@@ -14,13 +14,31 @@ namespace AuthMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.5")
+                .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("AuthRepository.DataModels.AuthRole", b =>
+                {
+                    b.Property<byte>("Id")
+                        .HasColumnType("tinyint unsigned");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("varchar(10) CHARACTER SET utf8mb4")
+                        .HasMaxLength(10);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuthRole");
+                });
 
             modelBuilder.Entity("AuthRepository.DataModels.AuthUser", b =>
                 {
-                    b.Property<byte[]>("Guid")
-                        .HasColumnType("varbinary(16)");
+                    b.Property<string>("Id")
+                        .HasColumnType("char(26)");
+
+                    b.Property<byte>("AuthRoleId")
+                        .HasColumnType("tinyint unsigned");
 
                     b.Property<byte[]>("PasswordHash")
                         .IsRequired()
@@ -34,10 +52,12 @@ namespace AuthMigrations.Migrations
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("varchar(30)")
+                        .HasColumnType("varchar(30) CHARACTER SET utf8mb4")
                         .HasMaxLength(30);
 
-                    b.HasKey("Guid");
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthRoleId");
 
                     b.HasIndex("Username")
                         .IsUnique();
@@ -47,33 +67,40 @@ namespace AuthMigrations.Migrations
 
             modelBuilder.Entity("AuthRepository.DataModels.JwtRefreshToken", b =>
                 {
-                    b.Property<byte[]>("UserGuid")
-                        .HasColumnType("varbinary(16)");
+                    b.Property<string>("UserId")
+                        .HasColumnType("char(26)");
 
                     b.Property<string>("RefreshTokenString")
-                        .HasColumnType("varchar(512)")
+                        .HasColumnType("varchar(512) CHARACTER SET utf8mb4")
                         .HasMaxLength(512);
 
                     b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("IssuedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
-                    b.HasKey("UserGuid", "RefreshTokenString");
+                    b.HasKey("UserId", "RefreshTokenString");
 
                     b.HasIndex("ExpiresAt");
 
-                    b.HasIndex("IssuedAt");
-
                     b.ToTable("RefreshTokens");
+                });
+
+            modelBuilder.Entity("AuthRepository.DataModels.AuthUser", b =>
+                {
+                    b.HasOne("AuthRepository.DataModels.AuthRole", "AuthRole")
+                        .WithMany()
+                        .HasForeignKey("AuthRoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("AuthRepository.DataModels.JwtRefreshToken", b =>
                 {
                     b.HasOne("AuthRepository.DataModels.AuthUser", "AuthUser")
                         .WithMany("RefreshTokens")
-                        .HasForeignKey("UserGuid")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

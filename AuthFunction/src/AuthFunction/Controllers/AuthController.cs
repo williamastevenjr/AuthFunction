@@ -8,6 +8,7 @@ using AuthService.Interfaces;
 using JwtAuth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Ws.JwtAuth.Extensions;
 
 namespace AuthFunction.Controllers
 {
@@ -32,7 +33,7 @@ namespace AuthFunction.Controllers
             var result = await _authService.Auth(request);
             if (result == null)
             {
-                return NotFound();
+                return Unauthorized("Invalid account or password.");
             }
 
             return Ok(new BaseResponse(result));
@@ -45,7 +46,7 @@ namespace AuthFunction.Controllers
             var result = await _authService.RefreshTokenAuth(request);
             if (result == null)
             {
-                return BadRequest();
+                return Unauthorized("Invalid refresh request.");
             }
             return Ok(new BaseResponse(result));
         }
@@ -54,7 +55,11 @@ namespace AuthFunction.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> CreateAccount([FromBody] CreateAccountRequest request)
         {
-            var result = await _authService.CreateAuth(request.Username, request.Password);
+            if (!request.Password.Equals(request.ConfirmPassword))
+            {
+                return BadRequest("Password doesn't match confirm password");
+            }
+            var result = await _authService.CreateAuth(request.AccountName, request.Password);
             if (result == null)
             {
                 return BadRequest();
@@ -66,8 +71,8 @@ namespace AuthFunction.Controllers
         [Authorize(Roles = "User")]
         public async Task<IActionResult> Logout()
         {
-            var user = JwtUser.GetJwtUser(HttpContext);
-            await _authService.RemoveRefreshTokens(user.UserGuid);
+            var user = JwtInspector.GetJwtUser(HttpContext);
+            await _authService.RemoveRefreshTokens(user.UserId);
             return Ok();
         }
     }

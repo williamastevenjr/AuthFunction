@@ -5,7 +5,7 @@ namespace AuthDtos.Request
     public class JwtAuthRequest
     {
         [Required]
-        public string Username { get; set; }
+        public string AccountName { get; set; }
 
         [Required]
         public string Password { get; set; }

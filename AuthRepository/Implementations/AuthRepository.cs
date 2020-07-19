@@ -11,47 +11,54 @@ using AuthDtos.Response;
 using AuthRepository.Context;
 using AuthRepository.DataModels;
 using AuthRepository.Interfaces;
-using JWT;
-using JWT.Algorithms;
-using JWT.Serializers;
+using JwtAuth;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using MiniGuids;
 
 namespace AuthRepository.Implementations
 {
     public class AuthRepository: IAuthRepository
     {
         private readonly Func<AuthDbContext> _contextFactory;
+        private readonly IConfigurationSection _jwtConfiguration;
+        private readonly string _validRefreshCharSet;
 
-        public AuthRepository(Func<AuthDbContext> contextFactory)
+        public AuthRepository(Func<AuthDbContext> contextFactory, IConfiguration configuration)
         {
             _contextFactory = contextFactory;
+            _validRefreshCharSet =
+                configuration.GetSection("JwtIssuerOptions").GetSection("RefreshToken")["RefreshTokenCharSet"] ??
+                throw new Exception("missing valid refresh token char set");
+            _jwtConfiguration = configuration.GetSection("JwtIssuerOptions") ?? throw new Exception("MissingJwtIssuerOptions");
         }
 
         public async Task<JwtAuthResponse> Auth(JwtAuthRequest request)
         {
             await using var context = _contextFactory.Invoke();
-            var userResult = await context.AuthUsers.Where(x => x.Username.Equals(request.Username))
+            var userResult = await context.AuthUsers.Where(x => x.Username.Equals(request.AccountName))
                 .Select(x=> new
                 {
                     salt = x.Salt,
                     hash = x.PasswordHash,
-                    guid = x.Guid
+                    guid = x.Id
                 })
                 .FirstOrDefaultAsync();
+
             JwtAuthResponse response = null;
             if (userResult != null)
             {
                 if (Validate(request.Password, userResult.salt, userResult.hash))
                 {
                     var jwt = GenerateJwt(userResult.guid);
-                    var refreshToken = GenerateRefreshToken(userResult.guid);
+                    var refreshToken = GenerateRefreshToken();
                     if (!string.IsNullOrWhiteSpace(refreshToken) && !string.IsNullOrWhiteSpace(jwt))
                     {
                         var expiration = DateTime.UtcNow.AddDays(31);
                         var refreshTokenStore = new JwtRefreshToken
                         {
-                            UserGuid = userResult.guid,
+                            UserId = userResult.guid,
                             ExpiresAt = expiration,
                             RefreshTokenString = refreshToken
                         };
@@ -60,10 +67,6 @@ namespace AuthRepository.Implementations
 
                         response = new JwtAuthResponse(jwt, refreshToken, expiration);
                     }
-                }
-                else
-                {
-                    throw new Exception("fuck off");
                 }
             }
             
@@ -74,19 +77,19 @@ namespace AuthRepository.Implementations
         {
             await using var context = _contextFactory.Invoke();
             var refresh = await context.RefreshTokens.FirstOrDefaultAsync(x =>
-                x.UserGuid.Equals(refreshTokenRequest.UserGuid) &&
+                x.UserId.Equals(refreshTokenRequest.UserGuid) &&
                 x.RefreshTokenString.Equals(refreshTokenRequest.RefreshToken));
             JwtAuthResponse response = null;
             if (refresh != null)
             {
                 var jwt = GenerateJwt(refreshTokenRequest.UserGuid);
-                var refreshToken = GenerateRefreshToken(refreshTokenRequest.UserGuid);
+                var refreshToken = GenerateRefreshToken();
                 if (!string.IsNullOrWhiteSpace(refreshToken) && !string.IsNullOrWhiteSpace(jwt))
                 {
                     var expiration = DateTime.UtcNow.AddDays(31);
                     var refreshTokenStore = new JwtRefreshToken
                     {
-                        UserGuid = refreshTokenRequest.UserGuid,
+                        UserId = refreshTokenRequest.UserGuid,
                         ExpiresAt = expiration,
                         RefreshTokenString = refreshToken
                     };
@@ -124,17 +127,18 @@ namespace AuthRepository.Implementations
                 var account = new AuthUser
                 {
                     Username = username,
-                    Guid = Guid.NewGuid(),
+                    Id = MiniGuid.NewGuid(),
                     Salt = saltAndHash.salt,
-                    PasswordHash = saltAndHash.hash
+                    PasswordHash = saltAndHash.hash,
+                    AuthRoleId = (byte)JwtRole.User
                 };
                 await context.AuthUsers.AddAsync(account);
-                var jwt = GenerateJwt(account.Guid);
-                var refreshToken = GenerateRefreshToken(account.Guid);
+                var jwt = GenerateJwt(account.Id);
+                var refreshToken = GenerateRefreshToken();
                 var expiration = DateTime.UtcNow.AddDays(31);
                 var refreshTokenStore = new JwtRefreshToken
                 {
-                    UserGuid = account.Guid,
+                    UserId = account.Id,
                     ExpiresAt = expiration,
                     RefreshTokenString = refreshToken
                 };
@@ -149,16 +153,15 @@ namespace AuthRepository.Implementations
         public async Task<bool> RemoveRefreshTokens(Guid userGuid)
         {
             await using var context = _contextFactory.Invoke();
-            var refreshTokens = await context.RefreshTokens.Where(x => x.UserGuid.Equals(userGuid))
+            var refreshTokens = await context.RefreshTokens.Where(x => x.UserId.Equals(userGuid))
                 .ToListAsync();
             context.RefreshTokens.RemoveRange(refreshTokens);
             await context.SaveChangesAsync();
             return true;
         }
 
-        private string GenerateRefreshToken(Guid userGuid)
+        private string GenerateRefreshToken()
         {
-            const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_-;:'<>,.|+=/";
             StringBuilder res = new StringBuilder();
             using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
             {
@@ -168,10 +171,9 @@ namespace AuthRepository.Implementations
                 {
                     rng.GetBytes(uintBuffer);
                     uint num = BitConverter.ToUInt32(uintBuffer, 0);
-                    res.Append(valid[(int)(num % (uint)valid.Length)]);
+                    res.Append(_validRefreshCharSet[(int)(num % (uint)_validRefreshCharSet.Length)]);
                 }
             }
-
             return res.ToString();
         }
 
@@ -195,20 +197,20 @@ namespace AuthRepository.Implementations
 
         private string GenerateJwt(Guid userGuid)
         {
-            // generate token that is valid for 7 days
+            // generate token that is valid for 1 day
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("SmokinessPatienceOpulentlyMannedMothproofTreeBufferHuntsman");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Issuer = "dummythiccapi",
-                Subject = new ClaimsIdentity(new Claim[]
+                Issuer = _jwtConfiguration["JwtIssuer"],
+                Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim("sub", userGuid.ToString()),
+                    new Claim("sub", MiniGuid.NewGuid()),
                     new Claim(ClaimTypes.Role, "User")
                 }),
-                Audience = "dummythiccapi",
+                Audience = _jwtConfiguration["JwtIssuer"],
                 IssuedAt = DateTime.UtcNow,
-                Expires = DateTime.UtcNow.AddDays(1),
+                Expires = DateTime.UtcNow.AddDays(int.Parse(_jwtConfiguration["JwtExpireDays"])),
 
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };

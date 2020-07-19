@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using MiniGuids;
 using Newtonsoft.Json;
 
 namespace AuthDtos.Request
@@ -12,7 +13,7 @@ namespace AuthDtos.Request
         public string GrantType { get; set; }
 
         [Required, JsonProperty("client_id")]
-        public Guid UserGuid { get; set; }
+        public MiniGuid UserGuid { get; set; }
 
         [Required, JsonProperty("refresh_token")]
         public string RefreshToken { get; set; }
