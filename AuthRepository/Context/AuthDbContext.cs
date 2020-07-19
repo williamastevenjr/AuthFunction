@@ -1,8 +1,5 @@
-﻿using System;
-using AuthRepository.DataModels;
+﻿using AuthRepository.DataModels;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MiniGuids;
 
 namespace AuthRepository.Context
 {
