@@ -16,6 +16,12 @@ namespace AuthRepository.Context
         {
             //AuthUser
             modelBuilder.Entity<AuthUser>()
+                .Property(x => x.Id)
+                .HasColumnType("char(26)")
+                .HasCollation("utf8mb4_0900_as_cs")
+                .HasMaxLength(26)
+                .IsFixedLength();
+            modelBuilder.Entity<AuthUser>()
                 .HasIndex(x => x.Username)
                 .IsUnique();
             modelBuilder.Entity<AuthUser>()
@@ -38,6 +44,12 @@ namespace AuthRepository.Context
             //    .HasForeignKey(x => x.AuthRoleId);
 
             //JwtRefreshToken
+            modelBuilder.Entity<JwtRefreshToken>()
+                .Property(x => x.UserId)
+                .HasColumnType("char(26)")
+                .HasCollation("utf8mb4_0900_as_cs")
+                .HasMaxLength(26)
+                .IsFixedLength();
             modelBuilder.Entity<JwtRefreshToken>()
                 .HasKey(x => new {x.UserId, x.RefreshTokenString});//));//{x.UserUuid, x.RefreshTokenString});
             modelBuilder.Entity<JwtRefreshToken>()

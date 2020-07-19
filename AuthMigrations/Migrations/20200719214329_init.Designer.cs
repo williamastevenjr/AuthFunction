@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AuthMigrations.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20200719062401_init")]
+    [Migration("20200719214329_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,7 +37,10 @@ namespace AuthMigrations.Migrations
             modelBuilder.Entity("AuthRepository.DataModels.AuthUser", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("char(26)");
+                        .HasColumnType("char(26)")
+                        .IsFixedLength(true)
+                        .HasMaxLength(26)
+                        .HasAnnotation("MySql:Collation", "utf8mb4_0900_as_cs");
 
                     b.Property<byte>("AuthRoleId")
                         .HasColumnType("tinyint unsigned");
@@ -70,7 +73,10 @@ namespace AuthMigrations.Migrations
             modelBuilder.Entity("AuthRepository.DataModels.JwtRefreshToken", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("char(26)");
+                        .HasColumnType("char(26)")
+                        .IsFixedLength(true)
+                        .HasMaxLength(26)
+                        .HasAnnotation("MySql:Collation", "utf8mb4_0900_as_cs");
 
                     b.Property<string>("RefreshTokenString")
                         .HasColumnType("varchar(512) CHARACTER SET utf8mb4")

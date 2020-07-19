@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -150,7 +149,7 @@ namespace AuthRepository.Implementations
             throw new Exception("todo");
         }
 
-        public async Task<bool> RemoveRefreshTokens(MiniGuid userId)
+        public async Task<bool> RemoveRefreshTokens(string userId)
         {
             await using var context = _contextFactory.Invoke();
             var refreshTokens = await context.RefreshTokens

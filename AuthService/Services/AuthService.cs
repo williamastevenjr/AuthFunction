@@ -36,7 +36,7 @@ namespace AuthService.Services
             return result;
         }
 
-        public async Task<bool> RemoveRefreshTokens(MiniGuid userId)
+        public async Task<bool> RemoveRefreshTokens(string userId)
         {
             var result = await _authRepository.RemoveRefreshTokens(userId);
             return result;

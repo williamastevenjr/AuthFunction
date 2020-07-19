@@ -11,7 +11,7 @@ namespace AuthRepository.Interfaces
         Task<JwtAuthResponse> CreateAuth(string username, string password);
         Task<JwtAuthResponse> Auth(JwtAuthRequest request);
         Task<JwtAuthResponse> RefreshTokenAuth(AuthRefreshTokenRequest refreshTokenRequest);
-        Task<bool> RemoveRefreshTokens(MiniGuid userId);
+        Task<bool> RemoveRefreshTokens(string userId);
 
         Task<bool> RemoveExpiredRefreshTokens();
     }

@@ -23,11 +23,12 @@ namespace AuthMigrations.Migrations
                 name: "AuthUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<string>(type: "char(26)", fixedLength: true, maxLength: 26, nullable: false)
+                        .Annotation("MySql:Collation", "utf8mb4_0900_as_cs"),
                     Username = table.Column<string>(maxLength: 30, nullable: false),
+                    AuthRoleId = table.Column<byte>(nullable: false),
                     Salt = table.Column<byte[]>(maxLength: 264, nullable: false),
-                    PasswordHash = table.Column<byte[]>(maxLength: 264, nullable: false),
-                    AuthRoleId = table.Column<byte>(nullable: false)
+                    PasswordHash = table.Column<byte[]>(maxLength: 264, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -44,7 +45,8 @@ namespace AuthMigrations.Migrations
                 name: "RefreshTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(nullable: false),
+                    UserId = table.Column<string>(type: "char(26)", fixedLength: true, maxLength: 26, nullable: false)
+                        .Annotation("MySql:Collation", "utf8mb4_0900_as_cs"),
                     RefreshTokenString = table.Column<string>(maxLength: 512, nullable: false),
                     IssuedAt = table.Column<DateTime>(nullable: false),
                     ExpiresAt = table.Column<DateTime>(nullable: false)

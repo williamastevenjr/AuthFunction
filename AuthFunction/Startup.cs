@@ -1,4 +1,5 @@
-﻿using AuthRepository.Context;
+﻿using System;
+using AuthRepository.Context;
 using AuthRepository.Interfaces;
 using AuthService.Interfaces;
 using EFCore.DbContextFactory.Extensions;
@@ -11,8 +12,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Ws.EfCore.Extensions.TypeMappingExtensions;
 using Ws.JwtAuth.Extensions;
-using MySql.Data.EntityFrameworkCore.Extensions;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Thinktecture;
+using Ws.EfCore.Extensions.AppSettings;
 
 namespace AuthFunction
 {
@@ -22,11 +24,12 @@ namespace AuthFunction
 
         private const string SwaggerDocumentVersionName = "v1";
         private static string SwaggerDocumentServiceName => $"Auth API({SwaggerDocumentVersionName})";
-
+        private readonly MySqlAppSettings _mySqlAppSettings;
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            _mySqlAppSettings = new MySqlAppSettings(configuration.GetSection("MySql"));
         }
 
         public static IConfiguration Configuration { get; private set; }
@@ -63,11 +66,17 @@ namespace AuthFunction
             //repo
             services.AddTransient<IAuthRepository, AuthRepository.Implementations.AuthRepository>();
             services.AddDbContext<AuthDbContext>(builder =>
-                builder.UseMySQL(Configuration.GetConnectionString("AuthDb"))
-                    .AddRelationalTypeMappingSourcePlugin<MiniGuidTypeMappingPlugin>());
+                builder.UseMySql(Configuration.GetConnectionString("AuthDb"), mySqlOptions => mySqlOptions
+                    // replace with your Server Version and Type
+                    .ServerVersion(
+                        new Version(_mySqlAppSettings.Major, _mySqlAppSettings.Minor, _mySqlAppSettings.Build),
+                        ServerType.MySql)));
+                    //.AddRelationalTypeMappingSourcePlugin<MiniGuidTypeMappingPlugin>());
             services.AddDbContextFactory<AuthDbContext>(builder=> 
-                builder.UseMySQL(Configuration.GetConnectionString("AuthDb"))
-                    .AddRelationalTypeMappingSourcePlugin<MiniGuidTypeMappingPlugin>());
+                builder.UseMySql(Configuration.GetConnectionString("AuthDb"), mySqlOptions => mySqlOptions
+                        // replace with your Server Version and Type
+                        .ServerVersion(new Version(_mySqlAppSettings.Major, _mySqlAppSettings.Minor, _mySqlAppSettings.Build), ServerType.MySql)));
+                    //.AddRelationalTypeMappingSourcePlugin<MiniGuidTypeMappingPlugin>());
 
         }
 
