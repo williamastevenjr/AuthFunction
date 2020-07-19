@@ -37,15 +37,15 @@ namespace AuthMigrations.Migrations
                         column: x => x.AuthRoleId,
                         principalTable: "AuthRole",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
                 name: "RefreshTokens",
                 columns: table => new
                 {
-                    RefreshTokenString = table.Column<string>(maxLength: 512, nullable: false),
                     UserId = table.Column<string>(nullable: false),
+                    RefreshTokenString = table.Column<string>(maxLength: 512, nullable: false),
                     IssuedAt = table.Column<DateTime>(nullable: false),
                     ExpiresAt = table.Column<DateTime>(nullable: false)
                 },

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AuthMigrations.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20200719012012_init")]
+    [Migration("20200719062401_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -94,7 +94,7 @@ namespace AuthMigrations.Migrations
                     b.HasOne("AuthRepository.DataModels.AuthRole", "AuthRole")
                         .WithMany()
                         .HasForeignKey("AuthRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
