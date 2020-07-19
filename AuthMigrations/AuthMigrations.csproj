@@ -12,6 +12,8 @@
     <Compile Remove="Migrations\20200705222250_init2.Designer.cs" />
     <Compile Remove="Migrations\20200705222350_init2.cs" />
     <Compile Remove="Migrations\20200705222350_init2.Designer.cs" />
+    <Compile Remove="Migrations\20200719070052_init2.cs" />
+    <Compile Remove="Migrations\20200719070052_init2.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,16 +34,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.6" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.1" />
+    <PackageReference Include="MySql.Data" Version="8.0.21" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Ws.EfCore.Extensions\Ws.EfCore.Extensions.csproj" />
     <ProjectReference Include="..\AuthRepository\AuthRepository.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

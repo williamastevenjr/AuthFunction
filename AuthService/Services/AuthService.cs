@@ -4,6 +4,7 @@ using AuthDtos.Request;
 using AuthDtos.Response;
 using AuthRepository.Interfaces;
 using AuthService.Interfaces;
+using MiniGuids;
 
 namespace AuthService.Services
 {
@@ -35,9 +36,9 @@ namespace AuthService.Services
             return result;
         }
 
-        public async Task<bool> RemoveRefreshTokens(Guid userGuid)
+        public async Task<bool> RemoveRefreshTokens(MiniGuid userId)
         {
-            var result = await _authRepository.RemoveRefreshTokens(userGuid);
+            var result = await _authRepository.RemoveRefreshTokens(userId);
             return result;
         }
 

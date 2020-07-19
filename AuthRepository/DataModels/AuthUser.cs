@@ -23,7 +23,7 @@ namespace AuthRepository.DataModels
         [Required]
         public byte AuthRoleId { get; set; } 
 
-        public virtual IList<JwtRefreshToken> RefreshTokens { get; set; }
+        public virtual ICollection<JwtRefreshToken> RefreshTokens { get; set; }
         public virtual AuthRole AuthRole { get; set; }
     }
 }

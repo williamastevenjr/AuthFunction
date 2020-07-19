@@ -14,7 +14,6 @@ namespace AuthRepository.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             //AuthUser
             modelBuilder.Entity<AuthUser>()
                 .HasIndex(x => x.Username)
@@ -27,7 +26,8 @@ namespace AuthRepository.Context
             modelBuilder.Entity<AuthUser>()
                 .HasOne(x => x.AuthRole)
                 .WithMany()
-                .HasForeignKey(x => x.AuthRoleId);
+                .HasForeignKey(x => x.AuthRoleId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             ////AuthUserRoles
             //modelBuilder.Entity<AuthUserRole>()
@@ -39,10 +39,39 @@ namespace AuthRepository.Context
 
             //JwtRefreshToken
             modelBuilder.Entity<JwtRefreshToken>()
-                .HasKey(x => new {x.UserId, x.RefreshTokenString});
+                .HasKey(x => new {x.UserId, x.RefreshTokenString});//));//{x.UserUuid, x.RefreshTokenString});
             modelBuilder.Entity<JwtRefreshToken>()
                 .HasIndex(x => x.ExpiresAt);
         }
 
     }
+
+    //public sealed class Comp : IComparable<Comp>{
+    //    public MiniGuid UserUuid { get; set; }
+    //    private string RefreshTokenString { get; set; }
+    //    public Comp(MiniGuid mg, string str)
+    //    {
+    //        UserUuid = mg;
+    //        RefreshTokenString = str;
+    //    }
+        
+    //    public int CompareTo(Comp other)
+    //    {
+    //        if (UserUuid != other.UserUuid)
+    //        {
+    //            return String.Compare(UserUuid.ToString(), other.UserUuid.ToString(), StringComparison.Ordinal);
+    //        }
+    //        else
+    //        {
+    //            if (RefreshTokenString != other.RefreshTokenString)
+    //            {
+    //                return String.Compare(RefreshTokenString, other.RefreshTokenString, StringComparison.Ordinal);
+    //            }
+    //            else
+    //            {
+    //                return 0;
+    //            }
+    //        }
+    //    }
+    //}
 }

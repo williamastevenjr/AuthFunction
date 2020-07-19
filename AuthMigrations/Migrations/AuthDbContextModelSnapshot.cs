@@ -92,7 +92,7 @@ namespace AuthMigrations.Migrations
                     b.HasOne("AuthRepository.DataModels.AuthRole", "AuthRole")
                         .WithMany()
                         .HasForeignKey("AuthRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 

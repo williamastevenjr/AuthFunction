@@ -42,7 +42,7 @@ namespace AuthRepository.Implementations
                 {
                     salt = x.Salt,
                     hash = x.PasswordHash,
-                    guid = x.Id
+                    id = x.Id
                 })
                 .FirstOrDefaultAsync();
 
@@ -51,14 +51,14 @@ namespace AuthRepository.Implementations
             {
                 if (Validate(request.Password, userResult.salt, userResult.hash))
                 {
-                    var jwt = GenerateJwt(userResult.guid);
+                    var jwt = GenerateJwt(userResult.id);
                     var refreshToken = GenerateRefreshToken();
                     if (!string.IsNullOrWhiteSpace(refreshToken) && !string.IsNullOrWhiteSpace(jwt))
                     {
                         var expiration = DateTime.UtcNow.AddDays(31);
                         var refreshTokenStore = new JwtRefreshToken
                         {
-                            UserId = userResult.guid,
+                            UserId = userResult.id,
                             ExpiresAt = expiration,
                             RefreshTokenString = refreshToken
                         };
@@ -77,19 +77,19 @@ namespace AuthRepository.Implementations
         {
             await using var context = _contextFactory.Invoke();
             var refresh = await context.RefreshTokens.FirstOrDefaultAsync(x =>
-                x.UserId.Equals(refreshTokenRequest.UserGuid) &&
+                x.UserId.Equals(refreshTokenRequest.UserId) &&
                 x.RefreshTokenString.Equals(refreshTokenRequest.RefreshToken));
             JwtAuthResponse response = null;
             if (refresh != null)
             {
-                var jwt = GenerateJwt(refreshTokenRequest.UserGuid);
+                var jwt = GenerateJwt(refreshTokenRequest.UserId);
                 var refreshToken = GenerateRefreshToken();
                 if (!string.IsNullOrWhiteSpace(refreshToken) && !string.IsNullOrWhiteSpace(jwt))
                 {
                     var expiration = DateTime.UtcNow.AddDays(31);
                     var refreshTokenStore = new JwtRefreshToken
                     {
-                        UserId = refreshTokenRequest.UserGuid,
+                        UserId = refreshTokenRequest.UserId,
                         ExpiresAt = expiration,
                         RefreshTokenString = refreshToken
                     };
@@ -150,13 +150,17 @@ namespace AuthRepository.Implementations
             throw new Exception("todo");
         }
 
-        public async Task<bool> RemoveRefreshTokens(Guid userGuid)
+        public async Task<bool> RemoveRefreshTokens(MiniGuid userId)
         {
             await using var context = _contextFactory.Invoke();
-            var refreshTokens = await context.RefreshTokens.Where(x => x.UserId.Equals(userGuid))
+            var refreshTokens = await context.RefreshTokens
+                .Where(x => userId.Equals(x.UserId))
                 .ToListAsync();
-            context.RefreshTokens.RemoveRange(refreshTokens);
-            await context.SaveChangesAsync();
+            if (refreshTokens != null && refreshTokens.Any())
+            {
+                context.RemoveRange(refreshTokens.OrderBy(x=>x.UserId).ThenBy(x=>x.RefreshTokenString));
+                await context.SaveChangesAsync();
+            }
             return true;
         }
 
@@ -195,7 +199,7 @@ namespace AuthRepository.Implementations
             return (salt, derived.GetBytes(256));
         }
 
-        private string GenerateJwt(Guid userGuid)
+        private string GenerateJwt(MiniGuid userId)
         {
             // generate token that is valid for 1 day
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -205,7 +209,7 @@ namespace AuthRepository.Implementations
                 Issuer = _jwtConfiguration["JwtIssuer"],
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim("sub", MiniGuid.NewGuid()),
+                    new Claim("sub", userId),
                     new Claim(ClaimTypes.Role, "User")
                 }),
                 Audience = _jwtConfiguration["JwtIssuer"],
