@@ -10,7 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
 using Ws.JwtAuth.Extensions;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Ws.EfCore.Extensions.AppSettings;
@@ -37,10 +36,7 @@ namespace AuthFunction
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers()
-                .AddNewtonsoftJson(options=>
-                {
-                    options.AllowInputFormatterExceptionMessages = true;
-                });
+                .AddNewtonsoftJson();
 
             // Add S3 to the ASP.NET Core dependency injection framework.
             services.AddAWSService<Amazon.S3.IAmazonS3>();

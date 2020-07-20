@@ -11,6 +11,7 @@ namespace AuthFunction.Controllers
     /// <summary>
     /// ASP.NET Core Auth controller.
     /// </summary>
+    [ApiController]
     [Route("api/[controller]")]
     [Authorize]
     public class AuthController : ControllerBase
