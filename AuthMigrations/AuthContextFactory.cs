@@ -4,9 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using Thinktecture;
 using Ws.EfCore.Extensions.AppSettings;
-using Ws.EfCore.Extensions.TypeMappingExtensions;
 
 namespace AuthMigrations
 {

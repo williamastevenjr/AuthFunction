@@ -10,10 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Ws.EfCore.Extensions.TypeMappingExtensions;
+using Newtonsoft.Json;
 using Ws.JwtAuth.Extensions;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using Thinktecture;
 using Ws.EfCore.Extensions.AppSettings;
 
 namespace AuthFunction
@@ -38,7 +37,10 @@ namespace AuthFunction
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers()
-                .AddNewtonsoftJson();
+                .AddNewtonsoftJson(options=>
+                {
+                    options.AllowInputFormatterExceptionMessages = true;
+                });
 
             // Add S3 to the ASP.NET Core dependency injection framework.
             services.AddAWSService<Amazon.S3.IAmazonS3>();
@@ -76,8 +78,6 @@ namespace AuthFunction
                 builder.UseMySql(Configuration.GetConnectionString("AuthDb"), mySqlOptions => mySqlOptions
                         // replace with your Server Version and Type
                         .ServerVersion(new Version(_mySqlAppSettings.Major, _mySqlAppSettings.Minor, _mySqlAppSettings.Build), ServerType.MySql)));
-                    //.AddRelationalTypeMappingSourcePlugin<MiniGuidTypeMappingPlugin>());
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline

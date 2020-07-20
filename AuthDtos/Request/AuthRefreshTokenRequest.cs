@@ -8,16 +8,13 @@ namespace AuthDtos.Request
 {
     public class AuthRefreshTokenRequest
     {
-        [Required, JsonProperty("grant_type")]
+        [Required]
         public string GrantType { get; set; }
 
-        [Required, JsonProperty("client_id"), JsonConverter(typeof(JsonMiniGuidConverter))]
-        public MiniGuid ClientId { get; set; }
-
-        [JsonIgnore] 
-        public string UserId => ClientId.ToString();
-
-        [Required, JsonProperty("refresh_token")]
+        [Required, JsonConverter(typeof(JsonMiniGuidConverter))]
+        public MiniGuid UserId { get; set; }
+        
+        [Required]
         public string RefreshToken { get; set; }
     }
 }
