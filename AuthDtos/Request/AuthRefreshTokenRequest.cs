@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using JwtAuth;
 using MiniGuids;
-using Newtonsoft.Json;
 
 namespace AuthDtos.Request
 {
